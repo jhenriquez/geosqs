@@ -1,0 +1,23 @@
+{
+  "name": "geosqs",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AmazonSQS playground.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhenriquez/geosqs"
+  },
+  "author": "",
+  "license": "none",
+  "bugs": {
+    "url": "https://github.com/jhenriquez/geosqs/issues"
+  },
+  "homepage": "https://github.com/jhenriquez/geosqs",
+  "dependencies": {
+    "aws-sdk": "^2.0.19"
+  }
+}
