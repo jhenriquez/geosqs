@@ -45,7 +45,11 @@ consumer.on('deleteSuccessful', function () {
 	this.retrieveMessages();
 });
 
-consumer.on('noMessages', function () {
+consumer.on('errorOnMessageRetrieve', function (e) {
+	console.log(e);
+});
+
+consumer.on('noMessages', function () {	
 	console.log('No messages. Call me again!');
 	this.retrieveMessages();
 });
