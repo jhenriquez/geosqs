@@ -4,9 +4,7 @@
   "version": "0.1.0",
   "description": "AmazonSQS playground.",
   "main": "consume.js",
-  "s
-    "test": "echo \"Error: no test specifiecripts": {d\" && exit 1"
-  },
+  
   "repository": {
     "type": "git",
     "url": "https://github.com/jhenriquez/geosqs"

@@ -9,6 +9,11 @@ function GeolocationHandler(cfg) {
 	var processed = [];
 
 	function processMessage (message, next, onErr) {
+		if (configuration.cache.contains(message)) {
+			console.log('From cache.');
+			return next(configuration.cache.retrieve(message));
+		}
+
 		http.get(configuration.serviceUrl + message.view.ip, function (rs) {
 			var body = '';
 
@@ -17,10 +22,10 @@ function GeolocationHandler(cfg) {
 			});
 
 			rs.on('end', function ()  {
-				console.log(body);
 				var rs = JSON.parse(body);
 				message.view.lat = rs.latitude;
 				message.view.long = rs.longitude;
+				configuration.cache.cache(message);
 				next(message);
 			});
 		}).on('error', onErr);
@@ -38,10 +43,12 @@ function GeolocationHandler(cfg) {
 		processMessage(
 			message,
 			function (rs) {
+				console.log(rs);
 				processed.push(rs);
 				if (processed.length < configuration.messages.length) {
-					process(configuration.messages);
+					process();
 				} else {
+					processed = [];
 					self.emit('ProcessCompleted', processed);
 				}
 

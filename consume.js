@@ -1,5 +1,6 @@
 var Handler = require('./SQSHandler'),
 	GeoService = require('./GeolocationHandler'),
+	GeoCache = require('./GeolocationCache'),
 	creds = require('./cfg/credentials'),
 	qs = require('./cfg/queues');
 
@@ -17,40 +18,28 @@ var publisher = new Handler({
 	region: creds.region
 });
 
+var geoCache = new GeoCache();
+
 consumer.on('messagesReceived', function (messages) {
 	console.log("Messages received. Let's process.");
-
-	var geoService = new GeoService({messages: messages, serviceUrl: 'http://freegeoip.net/json/'});
+	console.log(messages);
+	var geoService = new GeoService({messages: messages, serviceUrl: 'http://freegeoip.net/json/', cache: geoCache });
 
 	geoService.on('ProcessCompleted', function (processed) {
+		console.log('processed');
 		publisher.createMessages(processed);
+		consumer.deleteMessages(processed);
+		consumer.emit('done');
 	});
 
 	geoService.process();
 });
 
-publisher.on('errorOnCreateMessages', function (err) {
-	console.log(err);
-});
-
-publisher.on('createSuccessful', function (messages)  {
-	console.log('created! allow me to delete!');
-	consumer.deleteMessages(messages);
-	console.log('And... run again!');
-	consumer.retrieveMessages();
-});
-
-consumer.on('deleteSuccessful', function () {
-	console.log("Well deleted those... Let's run again!");
-	this.retrieveMessages();
-});
-
-consumer.on('errorOnMessageRetrieve', function (e) {
-	console.log(e);
-});
-
 consumer.on('noMessages', function () {	
-	console.log('No messages. Call me again!');
+	this.emit('done');
+});
+
+consumer.on('done', function () {
 	this.retrieveMessages();
 });
 

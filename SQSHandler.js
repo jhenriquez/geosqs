@@ -40,6 +40,8 @@ function SQSHandler(cfg) {
 						id: message.MessageId,
 						handle: message.ReceiptHandle
 					};
+					console.log(message.Body);
+					console.log(typeof(message.Body));
 					mapped.view = JSON.parse(message.Body);
 					return mapped;
 				}));
@@ -73,8 +75,8 @@ function SQSHandler(cfg) {
 
 	this.createMessages = function (messages) {
 		var self = this;
-		var entries = messages.map(function (message) {
-			var transform = {Id: message.id };
+		var entries = messages.map(function (message, index) {
+			var transform = {Id: message.id + index };
 			transform.MessageBody = JSON.stringify(message.view);
 			return transform;
 		});
