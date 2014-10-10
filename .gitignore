@@ -2,6 +2,10 @@
 logs
 *.log
 
+# Cfg
+cfg/
+
+
 # Runtime data
 pids
 *.pid
