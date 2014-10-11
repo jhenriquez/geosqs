@@ -1,5 +1,5 @@
 var Handler = require('./SQSHandler'),
-	GeoService = require('./GeolocationHandler'),
+	GeoService = require('./GeolocationProcessor'),
 	GeoCache = require('./GeolocationCache'),
 	creds = require('./cfg/credentials'),
 	qs = require('./cfg/queues');
@@ -20,36 +20,54 @@ var publisher = new Handler({
 
 var geoCache = new GeoCache();
 
-consumer.on('messagesReceived', function (messages) {
-	console.log("Messages received. Let's process.");
+consumer.on('MessagesReceived', function (messages) {
 	var geoService = new GeoService({messages: messages, serviceUrl: 'http://freegeoip.net/json/', cache: geoCache });
 
 	geoService.on('ProcessCompleted', function (processed) {
-		console.log('processed');
+		
+		processed.forEach(function (message) { 
+			console.log('Processed Message: ', message.id ); 
+		});
+
 		publisher.createMessages(processed);
 		consumer.deleteMessages(processed);
 		consumer.emit('done');
 	});
 
+	geoService.on('ProcessedFromCache', function (message) {
+		console.log('Processed Message Id From Cache: ', message.id);
+	});
+
 	geoService.process();
 });
 
-publisher.on('errorOnCreateMessages', function (e) {
-	console.log('ErrorOnCreate');
+consumer.on('ErrorOnMessagesDelete', function (e) {
 	console.log(e);
 });
 
-consumer.on('errorOnMessageDelete', function (e) {
-	console.log('errorOnMessageDelete');
-	console.log(e);
-});
-
-consumer.on('noMessages', function () {	
+consumer.on('NoMessagesReceived', function () {	
 	this.emit('done');
 });
 
 consumer.on('done', function () {
+	console.log('.');
 	this.retrieveMessages();
+});
+
+consumer.on('DeleteSuccessful', function (messages) {
+	console.log('Successfully Removed: ', messages.length);
+});
+
+consumer.on('MessagesReceived', function (messages) {
+	console.log('Messages Received. Processing: ', messages.length);
+});
+
+publisher.on('ErrorOnMessagesCreate', function (e) {
+	console.log(e);
+});
+
+publisher.on('CreateSuccessful', function (messages) {
+	console.log('Successfully Published: ', messages.length);
 });
 
 consumer.retrieveMessages();

@@ -1,16 +1,18 @@
 var EventEmitter = require('events').EventEmitter, http = require('http');
 
-GeolocationHandler.prototype = Object.create(EventEmitter.prototype);
-GeolocationHandler.prototype.constructor = GeolocationHandler;
+GeolocationProcessor.prototype = Object.create(EventEmitter.prototype);
+GeolocationProcessor.prototype.constructor = GeolocationProcessor;
 
-function GeolocationHandler(cfg) {
+function GeolocationProcessor(cfg) {
 
 	var configuration = cfg;
 	var processed = [];
 
 	function processMessage (message, next, onErr) {
-		if (configuration.cache.contains(message)) {
-			return next(configuration.cache.retrieve(message));
+		if (configuration.cache && configuration.cache.contains(message)) {
+			this.emit('ProcessedFromCache', message);
+			next(configuration.cache.retrieve(message));
+			return;
 		}
 
 		http.get(configuration.serviceUrl + message.view.ip, function (rs) {
@@ -24,7 +26,11 @@ function GeolocationHandler(cfg) {
 				var rs = JSON.parse(body);
 				message.view.lat = rs.latitude;
 				message.view.long = rs.longitude;
-				configuration.cache.cache(message);
+
+				if (configuration.cache) {
+					configuration.cache.cache(message);
+				}
+
 				next(message);
 			});
 		}).on('error', onErr);
@@ -57,4 +63,4 @@ function GeolocationHandler(cfg) {
 	};
 };
 
-module.exports = GeolocationHandler;
+module.exports = GeolocationProcessor;

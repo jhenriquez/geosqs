@@ -27,21 +27,19 @@ function SQSHandler(cfg) {
 		}, 
 		function (err, data) {
 			if (err) {
-				return self.emit('errorOnMessageRetrieve', err);
+				return self.emit('ErrorOnMessagesRetrieve', err);
 			}
 
 			if(!data.Messages) {
-				return self.emit('noMessages');
+				return self.emit('NoMessagesReceived');
 			}
 
-			self.emit('messagesReceived',
+			self.emit('MessagesReceived',
 				data.Messages.map(function (message) {
 					var mapped = {
 						id: message.MessageId,
 						handle: message.ReceiptHandle
 					};
-					console.log(message.Body);
-					console.log(typeof(message.Body));
 					mapped.view = JSON.parse(message.Body);
 					return mapped;
 				}));
@@ -62,14 +60,14 @@ function SQSHandler(cfg) {
 		}, 
 		function (err, data) {
 			if (err) {
-				return self.emit('errorOnMessageDelete', err);
+				return self.emit('ErrorOnMessagesDelete', err);
 			}
 
 			if (data.Successful.length === messages.length) {
-				return self.emit('deleteSuccessful', data.Successful);
+				return self.emit('DeleteSuccessful', data.Successful);
 			}
 
-			self.emit('failedMessagesDeleted', data.Failed);
+			self.emit('FailedMessagesDelete', data.Failed);
 		});
 	};
 
@@ -85,14 +83,14 @@ function SQSHandler(cfg) {
 			Entries: entries
 		}, function (err, data) {
 			if (err) {
-				return self.emit('errorOnCreateMessages',err);
+				return self.emit('ErrorOnMessagesCreate',err);
 			}
 
 			if (data.Successful.length === messages.length) {
-				return self.emit('createSuccessful', messages);
+				return self.emit('CreateSuccessful', messages);
 			}
 
-			self.emit('createFailed', data.Failed);
+			self.emit('FailedMessagesCreate', data.Failed);
 		});
 	};
 }
