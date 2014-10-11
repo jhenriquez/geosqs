@@ -22,7 +22,6 @@ var geoCache = new GeoCache();
 
 consumer.on('messagesReceived', function (messages) {
 	console.log("Messages received. Let's process.");
-	console.log(messages);
 	var geoService = new GeoService({messages: messages, serviceUrl: 'http://freegeoip.net/json/', cache: geoCache });
 
 	geoService.on('ProcessCompleted', function (processed) {
@@ -33,6 +32,16 @@ consumer.on('messagesReceived', function (messages) {
 	});
 
 	geoService.process();
+});
+
+publisher.on('errorOnCreateMessages', function (e) {
+	console.log('ErrorOnCreate');
+	console.log(e);
+});
+
+consumer.on('errorOnMessageDelete', function (e) {
+	console.log('errorOnMessageDelete');
+	console.log(e);
 });
 
 consumer.on('noMessages', function () {	

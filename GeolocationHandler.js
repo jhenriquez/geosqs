@@ -10,7 +10,6 @@ function GeolocationHandler(cfg) {
 
 	function processMessage (message, next, onErr) {
 		if (configuration.cache.contains(message)) {
-			console.log('From cache.');
 			return next(configuration.cache.retrieve(message));
 		}
 
@@ -43,12 +42,10 @@ function GeolocationHandler(cfg) {
 		processMessage(
 			message,
 			function (rs) {
-				console.log(rs);
 				processed.push(rs);
 				if (processed.length < configuration.messages.length) {
 					process();
 				} else {
-					processed = [];
 					self.emit('ProcessCompleted', processed);
 				}
 

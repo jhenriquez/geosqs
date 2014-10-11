@@ -66,7 +66,7 @@ function SQSHandler(cfg) {
 			}
 
 			if (data.Successful.length === messages.length) {
-				return self.emit('deleteSuccessful');
+				return self.emit('deleteSuccessful', data.Successful);
 			}
 
 			self.emit('failedMessagesDeleted', data.Failed);
@@ -76,11 +76,10 @@ function SQSHandler(cfg) {
 	this.createMessages = function (messages) {
 		var self = this;
 		var entries = messages.map(function (message, index) {
-			var transform = {Id: message.id + index };
+			var transform = {Id: message.id };
 			transform.MessageBody = JSON.stringify(message.view);
 			return transform;
 		});
-		
 		amazon.sendMessageBatch({
 			QueueUrl: configuration.queueUrl,
 			Entries: entries
