@@ -38,7 +38,8 @@ function GeolocationProcessor(cfg) {
 
 	this.process = function () {
 		if (configuration.messages.length === 0) {
-			return this.emit('NoMessages');
+			this.emit('NoMessages');
+			return;
 		}
 
 		var self = this;
