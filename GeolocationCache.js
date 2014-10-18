@@ -4,23 +4,23 @@ function GeolocationCache () {
 	var ips = {};
 
 	this.contains = function (pageview) {
-		return ips[pageview.view.ip] && ((ips[pageview.view.ip].cacheDate - Date.now()) / 36e5) < 24;
+		return ips[pageview.ip] && ((ips[pageview.ip].cacheDate - Date.now()) / 36e5) < 24;
 	};
 
 	this.cache = function (pageview) {
 		if (this.contains(pageview))
 			return;
-		ips[pageview.view.ip] = ips[pageview.view.ip] || {};
-		ips[pageview.view.ip].lat = pageview.view.lat;
-		ips[pageview.view.ip].long = pageview.view.long;
-		ips[pageview.view.ip].cacheDate = Date.now();
+		ips[pageview.ip] = ips[pageview.ip] || {};
+		ips[pageview.ip].lat = pageview.lat;
+		ips[pageview.ip].long = pageview.long;
+		ips[pageview.ip].cacheDate = Date.now();
 	};
 
 	this.retrieve = function (pageview) {
 		if (!this.contains(pageview))
 			return null;
-		pageview.view.lat = ips[pageview.view.ip].lat;
-		pageview.view.long = ips[pageview.view.ip].long;
+		pageview.lat = ips[pageview.ip].lat;
+		pageview.long = ips[pageview.ip].long;
 		return pageview;
 	};
 }

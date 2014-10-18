@@ -9,9 +9,9 @@ function GeolocationProcessor(cfg) {
 	var processed = [];
 
 	function processMessage (message, next, onErr) {
-		if (configuration.cache && configuration.cache.contains(message)) {
+		if (configuration.cache && configuration.cache.contains(message.view)) {
 			this.emit('ProcessedFromCache', message);
-			next(configuration.cache.retrieve(message));
+			next(configuration.cache.retrieve(message.view));
 			return;
 		}
 
@@ -28,7 +28,7 @@ function GeolocationProcessor(cfg) {
 				message.view.long = rs.longitude;
 
 				if (configuration.cache) {
-					configuration.cache.cache(message);
+					configuration.cache.cache(message.view);
 				}
 
 				next(message);
